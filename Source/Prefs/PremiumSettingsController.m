@@ -77,7 +77,8 @@
 
     NSDictionary *data = settingsData[sender.tag];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableDictionary *YTMUltimateDict = [NSMutableDictionary dictionaryWithDictionary:[defaults dictionaryForKey:@"YTMUltimate"]];
+    NSDictionary *existing = [defaults dictionaryForKey:@"YTMUltimate"];
+    NSMutableDictionary *YTMUltimateDict = existing ? [NSMutableDictionary dictionaryWithDictionary:existing] : [NSMutableDictionary dictionary];
 
     [YTMUltimateDict setObject:@([sender isOn]) forKey:data[@"key"]];
     [defaults setObject:YTMUltimateDict forKey:@"YTMUltimate"];
