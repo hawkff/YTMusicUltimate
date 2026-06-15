@@ -119,3 +119,6 @@
 "ALL_DOWNLOADS" = "alle heruntergeladenen audios"; //keep it lowercase
 "DELETE" = "Löschen";
 "RENAME" = "Umbenennen";
+
+"MOBILE_AUDIO_TIER" = "Mobile-Audio-Tarif-Spoof";
+"MOBILE_AUDIO_TIER_DESC" = "Hält die kostenlose Audio-Tarif-Umgehung aktiviert. Deaktivieren, wenn du YouTube Premium hast, um native Downloads wiederherzustellen.";

@@ -119,3 +119,6 @@
 "ALL_DOWNLOADS" = "all download audios"; //keep it lowercase
 "DELETE" = "Delete";
 "RENAME" = "Rename";
+
+"MOBILE_AUDIO_TIER" = "モバイルオーディオティアのスプーフ";
+"MOBILE_AUDIO_TIER_DESC" = "無料オーディオティアの回避策を有効に保ちます。YouTube Premium をお持ちの場合はオフにすると、ネイティブのダウンロードが復元されます。";

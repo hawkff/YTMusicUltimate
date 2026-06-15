@@ -119,3 +119,6 @@
 "ALL_DOWNLOADS" = "كل التحميلات";  //keep it lowercase
 "DELETE" = "حذف";
 "RENAME" = "Rename";
+
+"MOBILE_AUDIO_TIER" = "انتحال فئة الصوت للجوال";
+"MOBILE_AUDIO_TIER_DESC" = "يُبقي حل فئة الصوت المجانية مُفعّلاً. أوقفه إذا كان لديك YouTube Premium لاستعادة التنزيلات الأصلية.";

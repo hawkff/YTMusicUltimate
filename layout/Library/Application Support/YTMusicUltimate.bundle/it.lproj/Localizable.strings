@@ -118,3 +118,6 @@
 "ALL_DOWNLOADS" = "scarica tutti gli audio"; //keep it lowercase
 "DELETE" = "Cancella";
 "RENAME" = "Rinomina";
+
+"MOBILE_AUDIO_TIER" = "Spoof livello audio mobile";
+"MOBILE_AUDIO_TIER_DESC" = "Mantiene attiva la soluzione del livello audio gratuito. Disattivalo se hai YouTube Premium per ripristinare i download nativi.";

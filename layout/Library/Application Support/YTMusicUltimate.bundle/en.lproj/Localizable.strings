@@ -8,6 +8,8 @@
 "NO_ADS_DESC" = "Removes ads in the app";
 "BACKGROUND_PLAYBACK" = "Background playback";
 "BACKGROUND_PLAYBACK_DESC" = "Activates background playback";
+"MOBILE_AUDIO_TIER" = "Mobile audio tier spoof";
+"MOBILE_AUDIO_TIER_DESC" = "Keeps the free audio-tier workaround enabled. Turn off if you have YouTube Premium to restore native downloads.";
 "FORCE_PREMIUM" = "Force enable premium";
 "FORCE_PREMIUM_DESC" = "Forcibly enables premium features.\nThis option also disables Samples tab";
 

@@ -119,3 +119,6 @@
 "ALL_DOWNLOADS" = "tất cả âm thanh đã tải"; //keep it lowercase
 "DELETE" = "Xóa";
 "RENAME" = "Đặt tên";
+
+"MOBILE_AUDIO_TIER" = "Giả mạo gói âm thanh di động";
+"MOBILE_AUDIO_TIER_DESC" = "Giữ bật giải pháp gói âm thanh miễn phí. Tắt nếu bạn có YouTube Premium để khôi phục tải xuống gốc.";

@@ -5,6 +5,23 @@ static BOOL YTMU(NSString *key) {
     return [YTMUltimateDict[key] boolValue];
 }
 
+// Like YTMU, but returns a caller-supplied default when the key has never been written,
+// so newly-added toggles can default to ON without a migration step.
+static BOOL YTMUSetting(NSString *key, BOOL defaultValue) {
+    NSDictionary *YTMUltimateDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"YTMUltimate"];
+    id value = YTMUltimateDict[key];
+    return value ? [value boolValue] : defaultValue;
+}
+
+// Mobile Audio Tier spoofing makes the app behave as a free audio-only tier user. That is
+// desirable for non-Premium accounts (background play, etc.), but for a real Premium subscriber
+// it blocks the native "Download (Premium)" offline flow with "Premium required". Gate just the
+// audio-tier pieces behind an opt-out toggle (default ON to preserve previous behavior); real
+// Premium users can turn it off to restore native downloads.
+static BOOL YTMUMobileAudioTierSpoofEnabled(void) {
+    return YTMU(@"YTMUltimateIsEnabled") && YTMUSetting(@"mobileAudioTierSpoof", YES);
+}
+
 @interface YTIPivotBarItemRenderer : NSObject
 @property(copy, nonatomic) NSString *pivotIdentifier;
 - (NSString *)pivotIdentifier;
@@ -234,7 +251,7 @@ static BOOL YTMU(NSString *key) {
     return YTMU(@"YTMUltimateIsEnabled") ? nil : %orig;
 }
 - (BOOL)isMobileAudioTier {
-    return YTMU(@"YTMUltimateIsEnabled") ? YES : %orig;
+    return YTMUMobileAudioTierSpoofEnabled() ? YES : %orig;
 }
 %end
 
@@ -318,14 +335,14 @@ static BOOL YTMU(NSString *key) {
     return YTMU(@"YTMUltimateIsEnabled") ? YES : %orig;
 }
 - (BOOL)isCurrentUserMobileAudioTier {
-    return YTMU(@"YTMUltimateIsEnabled") ? YES : %orig;
+    return YTMUMobileAudioTierSpoofEnabled() ? YES : %orig;
 }
 %end
 
 %hook YTMWatchViewController
 - (id)init {
     self = %orig;
-    if (self && YTMU(@"YTMUltimateIsEnabled")) {
+    if (self && YTMUMobileAudioTierSpoofEnabled()) {
         [self setValue:[NSNumber numberWithBool:YES] forKey:@"_isMobileAudioTierMode"];
     }
     return self;
@@ -334,7 +351,7 @@ static BOOL YTMU(NSString *key) {
 
 %hook YTMQueueCollectionViewController
 - (BOOL)isMobileAudioTierQueue {
-    return YTMU(@"YTMUltimateIsEnabled") ? YES : %orig;
+    return YTMUMobileAudioTierSpoofEnabled() ? YES : %orig;
 }
 %end
 
@@ -368,7 +385,7 @@ static BOOL YTMU(NSString *key) {
 
 %hook YTMMusicAppMetadataImpl
 - (BOOL)isPremiumSubscriber { return YTMU(@"YTMUltimateIsEnabled") ?: %orig; }
-- (BOOL)isMobileAudioTier { return YTMU(@"YTMUltimateIsEnabled") ?: %orig; }
+- (BOOL)isMobileAudioTier { return YTMUMobileAudioTierSpoofEnabled() ?: %orig; }
 - (id)sidePanelPromo { return YTMU(@"YTMUltimateIsEnabled") ? nil : %orig; }
 %end
 

@@ -119,3 +119,6 @@
 "ALL_DOWNLOADS" = "tüm indirilmiş sesler"; //keep it lowercase
 "DELETE" = "Sil";
 "RENAME" = "Kaydet";
+
+"MOBILE_AUDIO_TIER" = "Mobil ses katmanı taklidi";
+"MOBILE_AUDIO_TIER_DESC" = "Ücretsiz ses katmanı geçici çözümünü etkin tutar. Yerel indirmeleri geri yüklemek için YouTube Premium'unuz varsa kapatın.";

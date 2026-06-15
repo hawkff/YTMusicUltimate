@@ -119,3 +119,6 @@
 "ALL_DOWNLOADS" = "visą atsiųstą muziką"; //keep it lowercase
 "DELETE" = "Panaikinti";
 "RENAME" = "Pervardyti";
+
+"MOBILE_AUDIO_TIER" = "Mobiliojo garso pakopos apgaulė";
+"MOBILE_AUDIO_TIER_DESC" = "Palieka įjungtą nemokamos garso pakopos sprendimą. Išjunkite, jei turite YouTube Premium, kad atkurtumėte savąsias atsisiuntimo funkcijas.";

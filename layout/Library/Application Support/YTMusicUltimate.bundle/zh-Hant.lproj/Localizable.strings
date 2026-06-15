@@ -119,3 +119,6 @@
 "ALL_DOWNLOADS" = "所有下載的音訊"; //keep it lowercase
 "DELETE" = "刪除";
 "RENAME" = "重新命名";
+
+"MOBILE_AUDIO_TIER" = "行動音訊層級偽裝";
+"MOBILE_AUDIO_TIER_DESC" = "保持免費音訊層級的變通方案啟用。如果你有 YouTube Premium，請關閉以還原原生下載。";

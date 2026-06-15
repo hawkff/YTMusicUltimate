@@ -119,3 +119,6 @@
 "ALL_DOWNLOADS" = "wszystkie pliki do pobrania"; //keep it lowercase
 "DELETE" = "Usuń";
 "RENAME" = "Zmień nazwę";
+
+"MOBILE_AUDIO_TIER" = "Podszywanie się pod mobilny poziom audio";
+"MOBILE_AUDIO_TIER_DESC" = "Utrzymuje włączone obejście darmowego poziomu audio. Wyłącz, jeśli masz YouTube Premium, aby przywrócić natywne pobieranie.";
