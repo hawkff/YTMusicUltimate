@@ -47,7 +47,7 @@ jobs:
         env:
           IPA_URL: ${{ inputs.ipa_url }}
         run: |
-          curl -L -r 0-1023 -o sample.part "$IPA_URL" > /dev/null 2>&1
+          curl -L --connect-timeout 15 --max-time 60 -r 0-1023 -o sample.part "$IPA_URL" > /dev/null 2>&1
           
           file_type=$(file --mime-type -b sample.part)
 
@@ -98,7 +98,7 @@ jobs:
       - name: Download YouTube Music
         env:
           IPA_URL: ${{ inputs.ipa_url }}
-        run: curl -L --fail --retry 3 --retry-delay 5 -o ytm.ipa "$IPA_URL"
+        run: curl -L --fail --retry 3 --retry-delay 5 --connect-timeout 15 --max-time 600 -o ytm.ipa "$IPA_URL"
 
       - name: Build Tweak for Sideloading
         run: |
