@@ -166,8 +166,8 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
 @end
 
 @interface ELMTouchCommandPropertiesHandler : NSObject
-- (void)downloadAudio:(YTPlayerViewController *)playerResponse;
-- (void)downloadCoverImage:(YTPlayerViewController *)playerResponse;
+- (void)downloadAudioWithPlayerResponse:(id)playerResponse playerVC:(YTPlayerViewController *)playerVC;
+- (void)downloadCoverImageWithPlayerResponse:(id)playerResponse;
 - (NSString *)getURLFromManifest:(NSURL *)manifest;
 - (NSData *)dataFromURL:(NSURL *)url;
 @end
@@ -198,12 +198,19 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
     YTMNowPlayingViewController *playingVC = (YTMNowPlayingViewController *)tapRecognizer.view._viewControllerForAncestor;
 
     // Fast path: the historical relationship chain. On older builds this resolves immediately.
+    // Read via exception-guarded KVC so a future build that drops -playerViewController falls
+    // through to the bounded search instead of throwing before the fallback can run.
     YTMWatchViewController *watchVC = (YTMWatchViewController *)playingVC.parentViewController;
-    YTPlayerViewController *playerVC = watchVC.playerViewController;
+    id candidatePlayerVC = YTMUSafeValueForKey(watchVC, @"playerViewController");
+
+    YTPlayerViewController *playerVC = nil;
+    if ([candidatePlayerVC isKindOfClass:%c(YTPlayerViewController)]) {
+        playerVC = (YTPlayerViewController *)candidatePlayerVC;
+    }
 
     // Fallback: bounded search seeded from the now-playing controller, used only when the
     // direct chain is broken on newer builds. Never scans windows or the full view tree.
-    if (![playerVC isKindOfClass:%c(YTPlayerViewController)]) {
+    if (!playerVC) {
         playerVC = YTMUResolvePlayerViewController(@[playingVC]);
     }
 
@@ -214,12 +221,14 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
         sheetController.sourceView = tapRecognizer.view;
         [sheetController addHeaderWithTitle:LOC(@"SELECT_ACTION") subtitle:nil];
 
+        // Capture the response resolved above so the chosen action reuses the exact object
+        // (which may have come from playingVC), instead of re-resolving from only playerVC.
         [sheetController addAction:[%c(YTActionSheetAction) actionWithTitle:LOC(@"DOWNLOAD_AUDIO") iconImage:[%c(YTUIResources) audioOutline] style:0 handler:^ {
-            [self downloadAudio:playerVC];
+            [self downloadAudioWithPlayerResponse:playerResponse playerVC:playerVC];
         }]];
 
         [sheetController addAction:[%c(YTActionSheetAction) actionWithTitle:LOC(@"DOWNLOAD_COVER") iconImage:[%c(YTUIResources) outlineImageWithColor:[UIColor whiteColor]] style:0 handler:^ {
-            [self downloadCoverImage:playerVC];
+            [self downloadCoverImageWithPlayerResponse:playerResponse];
         }]];
 
         [sheetController addAction:[%c(YTActionSheetAction) actionWithTitle:LOC(@"DOWNLOAD_PREMIUM") iconImage:[%c(YTUIResources) downloadOutline] secondaryIconImage:[%c(YTUIResources) youtubePremiumBadgeLight] accessibilityIdentifier:nil handler:^ {
@@ -229,9 +238,9 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
         if (YTMU(@"downloadAudio") && YTMU(@"downloadCoverImage")) {
             [sheetController presentFromViewController:playingVC animated:YES completion:nil];
         } else if (YTMU(@"downloadAudio")) {
-            [self downloadAudio:playerVC];
+            [self downloadAudioWithPlayerResponse:playerResponse playerVC:playerVC];
         } else if (YTMU(@"downloadCoverImage")) {
-            [self downloadCoverImage:playerVC];
+            [self downloadCoverImageWithPlayerResponse:playerResponse];
         }
     } else {
         YTAlertView *alertView = [%c(YTAlertView) infoDialog];
@@ -242,8 +251,11 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
 }
 
 %new
-- (void)downloadAudio:(YTPlayerViewController *)playerVC {
-    id playerResponse = YTMUResolvePlayerResponse(playerVC ? @[playerVC] : @[]);
+- (void)downloadAudioWithPlayerResponse:(id)playerResponse playerVC:(YTPlayerViewController *)playerVC {
+    // Fall back to resolving from playerVC only if the caller did not supply a response.
+    if (!playerResponse) {
+        playerResponse = YTMUResolvePlayerResponse(playerVC ? @[playerVC] : @[]);
+    }
 
     if (!playerResponse) {
         YTAlertView *alertView = [%c(YTAlertView) infoDialog];
@@ -276,9 +288,9 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
     ffmpeg.duration = [durationValue respondsToSelector:@selector(doubleValue)] ? round([durationValue doubleValue]) : 0;
 
     id thumbnailDetails = YTMUObjectForKey(videoDetails, @"thumbnail");
-    NSMutableArray *thumbnailsArray = YTMUObjectForKey(thumbnailDetails, @"thumbnailsArray");
-    YTIThumbnailDetails_Thumbnail *thumbnail = [thumbnailsArray lastObject];
-    NSString *thumbnailURLStr = thumbnail.URL;
+    id thumbnailsArray = YTMUObjectForKey(thumbnailDetails, @"thumbnailsArray");
+    id thumbnail = [thumbnailsArray respondsToSelector:@selector(lastObject)] ? [thumbnailsArray lastObject] : nil;
+    NSString *thumbnailURLStr = YTMUStringForKey(thumbnail, @"URL");
 
     // Manifest resolution does blocking network I/O, so run it off the main thread behind an
     // indeterminate HUD. This prevents the UI freeze / "never completes" state when the network
@@ -339,9 +351,16 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
     }];
     [task resume];
 
-    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(35.0 * NSEC_PER_SEC)));
-    [session finishTasksAndInvalidate];
+    // Hard cap above the session's own timeouts. If it trips, cancel the task and tear the
+    // session down immediately so nothing is left running in the background.
+    long waitResult = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(35.0 * NSEC_PER_SEC)));
+    if (waitResult != 0) {
+        [task cancel];
+        [session invalidateAndCancel];
+        return nil;
+    }
 
+    [session finishTasksAndInvalidate];
     return result;
 }
 
@@ -377,8 +396,7 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
 }
 
 %new
-- (void)downloadCoverImage:(YTPlayerViewController *)playerVC {
-    id playerResponse = YTMUResolvePlayerResponse(playerVC ? @[playerVC] : @[]);
+- (void)downloadCoverImageWithPlayerResponse:(id)playerResponse {
     if (!playerResponse) {
         YTAlertView *alertView = [%c(YTAlertView) infoDialog];
         alertView.title = LOC(@"OOPS");
@@ -390,10 +408,11 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
     id playerData = YTMUObjectForKey(playerResponse, @"playerData");
     id videoDetails = YTMUObjectForKey(playerData, @"videoDetails");
     id thumbnailDetails = YTMUObjectForKey(videoDetails, @"thumbnail");
-    NSMutableArray *thumbnailsArray = YTMUObjectForKey(thumbnailDetails, @"thumbnailsArray");
-    YTIThumbnailDetails_Thumbnail *thumbnail = [thumbnailsArray lastObject];
+    id thumbnailsArray = YTMUObjectForKey(thumbnailDetails, @"thumbnailsArray");
+    YTIThumbnailDetails_Thumbnail *thumbnail = [thumbnailsArray respondsToSelector:@selector(lastObject)] ? [thumbnailsArray lastObject] : nil;
+    NSString *baseURL = YTMUStringForKey(thumbnail, @"URL");
 
-    if (thumbnail.URL.length == 0) {
+    if (baseURL.length == 0) {
         YTAlertView *alertView = [%c(YTAlertView) infoDialog];
         alertView.title = LOC(@"OOPS");
         alertView.subtitle = LOC(@"LINK_NOT_FOUND");
@@ -401,7 +420,7 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
         return;
     }
 
-    NSString *thumbnailURL = [thumbnail.URL stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"w%u-h%u-", thumbnail.width, thumbnail.width] withString:@"w2048-h2048-"];
+    NSString *thumbnailURL = [baseURL stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"w%u-h%u-", thumbnail.width, thumbnail.width] withString:@"w2048-h2048-"];
 
     // FFMpegDownloader manages its own HUD (with success/failure states) and performs the
     // network fetch off the main thread, so it cannot hang the UI.

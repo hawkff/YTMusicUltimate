@@ -95,6 +95,9 @@
     int timeInMilliseconds = [statistics getTime];
     if (timeInMilliseconds > 0) {
         double totalVideoDuration = self.duration;
+        if (totalVideoDuration <= 0) {
+            return;
+        }
         double timeInSeconds = timeInMilliseconds / 1000.0;
         double percentage = timeInSeconds / totalVideoDuration;
 
