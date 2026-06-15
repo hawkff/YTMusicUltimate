@@ -138,21 +138,43 @@
 }
 
 - (void)downloadImage:(NSURL *)link {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSData *imageData = [NSData dataWithContentsOfURL:link];
-        UIImage *image = [UIImage imageWithData:imageData];
+    if (!link) return;
 
-        if (image) UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
-        self.hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
-        self.hud.mode = MBProgressHUDModeCustomView;
-        self.hud.label.text = LOC(@"SAVED_TO_PHOTOS");
+    self.hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
+    self.hud.mode = MBProgressHUDModeIndeterminate;
+    self.hud.label.text = LOC(@"DOWNLOADING");
 
-        UIImageView *checkmarkImageView = [[UIImageView alloc] initWithImage:[self imageWithSystemIconNamed:@"checkmark"]];
-        checkmarkImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.hud.customView = checkmarkImageView;
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+    config.timeoutIntervalForRequest = 20.0;
+    config.timeoutIntervalForResource = 30.0;
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
 
-        [self.hud hideAnimated:YES afterDelay:2.0];
-    });
+    NSURLSessionDataTask *task = [session dataTaskWithURL:link completionHandler:^(NSData *imageData, NSURLResponse *response, NSError *error) {
+        UIImage *image = imageData ? [UIImage imageWithData:imageData] : nil;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (image) {
+                UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
+                self.hud.mode = MBProgressHUDModeCustomView;
+                self.hud.label.text = LOC(@"SAVED_TO_PHOTOS");
+
+                UIImageView *checkmarkImageView = [[UIImageView alloc] initWithImage:[self imageWithSystemIconNamed:@"checkmark"]];
+                checkmarkImageView.contentMode = UIViewContentModeScaleAspectFit;
+                self.hud.customView = checkmarkImageView;
+            } else {
+                self.hud.mode = MBProgressHUDModeCustomView;
+                self.hud.label.text = LOC(@"OOPS");
+
+                UIImageView *xmarkImageView = [[UIImageView alloc] initWithImage:[self imageWithSystemIconNamed:@"xmark"]];
+                xmarkImageView.contentMode = UIViewContentModeScaleAspectFit;
+                self.hud.customView = xmarkImageView;
+            }
+
+            [self.hud hideAnimated:YES afterDelay:2.0];
+        });
+    }];
+    [task resume];
+    [session finishTasksAndInvalidate];
 }
 
 - (UIImage *)imageWithSystemIconNamed:(NSString *)iconName {
