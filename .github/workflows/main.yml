@@ -44,8 +44,10 @@ jobs:
           exclude_inputs: bundle_id,display_name
 
       - name: Validate IPA URL
+        env:
+          IPA_URL: ${{ inputs.ipa_url }}
         run: |
-          curl -L -r 0-1023 -o sample.part "${{ inputs.ipa_url }}" > /dev/null 2>&1
+          curl -L --connect-timeout 15 --max-time 60 -r 0-1023 -o sample.part "$IPA_URL" > /dev/null 2>&1
           
           file_type=$(file --mime-type -b sample.part)
 
@@ -94,7 +96,9 @@ jobs:
         run: pipx install --force https://github.com/asdfzxcvbn/pyzule-rw/archive/main.zip
 
       - name: Download YouTube Music
-        run: wget "${{ inputs.ipa_url }}" --no-verbose -O ytm.ipa
+        env:
+          IPA_URL: ${{ inputs.ipa_url }}
+        run: curl -L --fail --retry 3 --retry-delay 5 --connect-timeout 15 --max-time 600 -o ytm.ipa "$IPA_URL"
 
       - name: Build Tweak for Sideloading
         run: |
@@ -103,7 +107,15 @@ jobs:
           mv packages/*.deb ../ytmult.deb
 
       - name: Inject tweak into provided IPA
-        run: cyan -i ytm.ipa -o YTMusicUltimate.ipa -uwsf ytmult.deb -n "${{ inputs.display_name }}" -b ${{ inputs.bundle_id }} 
+        env:
+          DISPLAY_NAME: ${{ inputs.display_name }}
+          BUNDLE_ID: ${{ inputs.bundle_id }}
+        run: |
+          if [[ ! "$BUNDLE_ID" =~ ^[A-Za-z0-9.-]+$ ]]; then
+            echo "::error::Invalid bundle id: $BUNDLE_ID"
+            exit 1
+          fi
+          cyan -i ytm.ipa -o YTMusicUltimate.ipa -uwsf ytmult.deb -n "$DISPLAY_NAME" -b "$BUNDLE_ID"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.5.0

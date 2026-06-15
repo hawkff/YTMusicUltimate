@@ -3,3 +3,9 @@
 .upload.swp
 .vscode/
 packages/
+
+# macOS AppleDouble / resource fork files
+._*
+**/._*
+.AppleDouble/
+__MACOSX/

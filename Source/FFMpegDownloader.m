@@ -95,6 +95,9 @@
     int timeInMilliseconds = [statistics getTime];
     if (timeInMilliseconds > 0) {
         double totalVideoDuration = self.duration;
+        if (totalVideoDuration <= 0) {
+            return;
+        }
         double timeInSeconds = timeInMilliseconds / 1000.0;
         double percentage = timeInSeconds / totalVideoDuration;
 
@@ -138,21 +141,48 @@
 }
 
 - (void)downloadImage:(NSURL *)link {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSData *imageData = [NSData dataWithContentsOfURL:link];
-        UIImage *image = [UIImage imageWithData:imageData];
+    if (!link) return;
 
-        if (image) UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
-        self.hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
-        self.hud.mode = MBProgressHUDModeCustomView;
-        self.hud.label.text = LOC(@"SAVED_TO_PHOTOS");
+    self.hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
+    self.hud.mode = MBProgressHUDModeIndeterminate;
+    self.hud.label.text = LOC(@"DOWNLOADING");
 
-        UIImageView *checkmarkImageView = [[UIImageView alloc] initWithImage:[self imageWithSystemIconNamed:@"checkmark"]];
-        checkmarkImageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.hud.customView = checkmarkImageView;
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+    config.timeoutIntervalForRequest = 20.0;
+    config.timeoutIntervalForResource = 30.0;
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
 
-        [self.hud hideAnimated:YES afterDelay:2.0];
-    });
+    NSURLSessionDataTask *task = [session dataTaskWithURL:link completionHandler:^(NSData *imageData, NSURLResponse *response, NSError *error) {
+        UIImage *image = imageData ? [UIImage imageWithData:imageData] : nil;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (image) {
+                // Result (success/failure) is reported from the save callback below so a
+                // failed write (e.g. Photos permission denied) does not show a false success.
+                UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
+            } else {
+                [self showImageResultSuccess:NO];
+            }
+        });
+    }];
+    [task resume];
+    [session finishTasksAndInvalidate];
+}
+
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    [self showImageResultSuccess:(error == nil)];
+}
+
+- (void)showImageResultSuccess:(BOOL)success {
+    self.hud.mode = MBProgressHUDModeCustomView;
+    self.hud.label.text = success ? LOC(@"SAVED_TO_PHOTOS") : LOC(@"OOPS");
+    self.hud.label.numberOfLines = 0;
+
+    UIImageView *iconImageView = [[UIImageView alloc] initWithImage:[self imageWithSystemIconNamed:success ? @"checkmark" : @"xmark"]];
+    iconImageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.hud.customView = iconImageView;
+
+    [self.hud hideAnimated:YES afterDelay:2.0];
 }
 
 - (UIImage *)imageWithSystemIconNamed:(NSString *)iconName {
