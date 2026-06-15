@@ -44,8 +44,10 @@ jobs:
           exclude_inputs: bundle_id,display_name
 
       - name: Validate IPA URL
+        env:
+          IPA_URL: ${{ inputs.ipa_url }}
         run: |
-          curl -L -r 0-1023 -o sample.part "${{ inputs.ipa_url }}" > /dev/null 2>&1
+          curl -L -r 0-1023 -o sample.part "$IPA_URL" > /dev/null 2>&1
           
           file_type=$(file --mime-type -b sample.part)
 
@@ -94,7 +96,9 @@ jobs:
         run: pipx install --force https://github.com/asdfzxcvbn/pyzule-rw/archive/main.zip
 
       - name: Download YouTube Music
-        run: curl -L --fail --retry 3 --retry-delay 5 -o ytm.ipa "${{ inputs.ipa_url }}"
+        env:
+          IPA_URL: ${{ inputs.ipa_url }}
+        run: curl -L --fail --retry 3 --retry-delay 5 -o ytm.ipa "$IPA_URL"
 
       - name: Build Tweak for Sideloading
         run: |

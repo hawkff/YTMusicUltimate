@@ -154,27 +154,32 @@
 
         dispatch_async(dispatch_get_main_queue(), ^{
             if (image) {
-                UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
-                self.hud.mode = MBProgressHUDModeCustomView;
-                self.hud.label.text = LOC(@"SAVED_TO_PHOTOS");
-
-                UIImageView *checkmarkImageView = [[UIImageView alloc] initWithImage:[self imageWithSystemIconNamed:@"checkmark"]];
-                checkmarkImageView.contentMode = UIViewContentModeScaleAspectFit;
-                self.hud.customView = checkmarkImageView;
+                // Result (success/failure) is reported from the save callback below so a
+                // failed write (e.g. Photos permission denied) does not show a false success.
+                UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
             } else {
-                self.hud.mode = MBProgressHUDModeCustomView;
-                self.hud.label.text = LOC(@"OOPS");
-
-                UIImageView *xmarkImageView = [[UIImageView alloc] initWithImage:[self imageWithSystemIconNamed:@"xmark"]];
-                xmarkImageView.contentMode = UIViewContentModeScaleAspectFit;
-                self.hud.customView = xmarkImageView;
+                [self showImageResultSuccess:NO];
             }
-
-            [self.hud hideAnimated:YES afterDelay:2.0];
         });
     }];
     [task resume];
     [session finishTasksAndInvalidate];
+}
+
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    [self showImageResultSuccess:(error == nil)];
+}
+
+- (void)showImageResultSuccess:(BOOL)success {
+    self.hud.mode = MBProgressHUDModeCustomView;
+    self.hud.label.text = success ? LOC(@"SAVED_TO_PHOTOS") : LOC(@"OOPS");
+    self.hud.label.numberOfLines = 0;
+
+    UIImageView *iconImageView = [[UIImageView alloc] initWithImage:[self imageWithSystemIconNamed:success ? @"checkmark" : @"xmark"]];
+    iconImageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.hud.customView = iconImageView;
+
+    [self.hud hideAnimated:YES afterDelay:2.0];
 }
 
 - (UIImage *)imageWithSystemIconNamed:(NSString *)iconName {
