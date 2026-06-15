@@ -121,4 +121,4 @@
 "RENAME" = "Zmień nazwę";
 
 "MOBILE_AUDIO_TIER" = "Podszywanie się pod mobilny poziom audio";
-"MOBILE_AUDIO_TIER_DESC" = "Utrzymuje włączone obejście darmowego poziomu audio. Wyłącz, jeśli masz YouTube Premium, aby przywrócić natywne pobieranie.";
+"MOBILE_AUDIO_TIER_DESC" = "Wymusza darmowy poziom tylko audio. Zostaw włączone dla zwykłego obejścia; wyłącz, jeśli masz prawdziwe YouTube Premium i chcesz, aby aplikacja odzwierciedlała Twój rzeczywisty poziom subskrypcji.";

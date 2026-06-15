@@ -121,4 +121,4 @@
 "RENAME" = "Pervardyti";
 
 "MOBILE_AUDIO_TIER" = "Mobiliojo garso pakopos apgaulė";
-"MOBILE_AUDIO_TIER_DESC" = "Palieka įjungtą nemokamos garso pakopos sprendimą. Išjunkite, jei turite YouTube Premium, kad atkurtumėte savąsias atsisiuntimo funkcijas.";
+"MOBILE_AUDIO_TIER_DESC" = "Priverčia programą naudoti nemokamą tik garso pakopą. Palikite įjungtą įprastam sprendimui; išjunkite, jei turite tikrą YouTube Premium ir norite, kad programa atspindėtų tikrąją jūsų prenumeratos pakopą.";

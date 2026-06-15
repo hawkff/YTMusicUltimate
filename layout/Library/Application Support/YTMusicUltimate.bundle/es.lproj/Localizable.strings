@@ -121,4 +121,4 @@
 "RENAME" = "Renombrar";
 
 "MOBILE_AUDIO_TIER" = "Suplantación de nivel de audio móvil";
-"MOBILE_AUDIO_TIER_DESC" = "Mantiene activada la solución del nivel de audio gratuito. Desactívalo si tienes YouTube Premium para restaurar las descargas nativas.";
+"MOBILE_AUDIO_TIER_DESC" = "Fuerza el nivel gratuito solo de audio. Déjalo activado para la solución habitual; desactívalo si tienes YouTube Premium real y quieres que la app refleje tu nivel de suscripción real.";

@@ -9,7 +9,7 @@
 "BACKGROUND_PLAYBACK" = "Background playback";
 "BACKGROUND_PLAYBACK_DESC" = "Activates background playback";
 "MOBILE_AUDIO_TIER" = "Mobile audio tier spoof";
-"MOBILE_AUDIO_TIER_DESC" = "Keeps the free audio-tier workaround enabled. Turn off if you have YouTube Premium to restore native downloads.";
+"MOBILE_AUDIO_TIER_DESC" = "Forces the app into the free audio-only tier. Leave on for the usual workaround; turn off if you have real YouTube Premium and want the app to reflect your actual subscription tier.";
 "FORCE_PREMIUM" = "Force enable premium";
 "FORCE_PREMIUM_DESC" = "Forcibly enables premium features.\nThis option also disables Samples tab";
 

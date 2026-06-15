@@ -121,4 +121,4 @@
 "RENAME" = "重新命名";
 
 "MOBILE_AUDIO_TIER" = "行動音訊層級偽裝";
-"MOBILE_AUDIO_TIER_DESC" = "保持免費音訊層級的變通方案啟用。如果你有 YouTube Premium，請關閉以還原原生下載。";
+"MOBILE_AUDIO_TIER_DESC" = "強制應用程式進入免費的純音訊層級。保持開啟以使用一般變通方案；如果你擁有真正的 YouTube Premium 並希望應用程式反映你的實際訂閱層級，請關閉。";

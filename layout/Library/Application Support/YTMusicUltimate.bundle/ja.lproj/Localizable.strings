@@ -121,4 +121,4 @@
 "RENAME" = "Rename";
 
 "MOBILE_AUDIO_TIER" = "モバイルオーディオティアのスプーフ";
-"MOBILE_AUDIO_TIER_DESC" = "無料オーディオティアの回避策を有効に保ちます。YouTube Premium をお持ちの場合はオフにすると、ネイティブのダウンロードが復元されます。";
+"MOBILE_AUDIO_TIER_DESC" = "アプリを無料の音声のみのティアに強制します。通常の回避策として有効のままにしてください。実際の YouTube Premium をお持ちで、アプリに実際の契約ティアを反映させたい場合はオフにしてください。";

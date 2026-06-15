@@ -120,4 +120,4 @@
 "RENAME" = "Rinomina";
 
 "MOBILE_AUDIO_TIER" = "Spoof livello audio mobile";
-"MOBILE_AUDIO_TIER_DESC" = "Mantiene attiva la soluzione del livello audio gratuito. Disattivalo se hai YouTube Premium per ripristinare i download nativi.";
+"MOBILE_AUDIO_TIER_DESC" = "Forza il livello gratuito solo audio. Lascialo attivo per la soluzione abituale; disattivalo se hai un vero YouTube Premium e vuoi che l'app rifletta il tuo livello di abbonamento reale.";

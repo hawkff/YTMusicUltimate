@@ -121,4 +121,4 @@
 "RENAME" = "Đặt tên";
 
 "MOBILE_AUDIO_TIER" = "Giả mạo gói âm thanh di động";
-"MOBILE_AUDIO_TIER_DESC" = "Giữ bật giải pháp gói âm thanh miễn phí. Tắt nếu bạn có YouTube Premium để khôi phục tải xuống gốc.";
+"MOBILE_AUDIO_TIER_DESC" = "Buộc ứng dụng vào gói chỉ âm thanh miễn phí. Để bật cho giải pháp thông thường; tắt nếu bạn có YouTube Premium thật và muốn ứng dụng phản ánh đúng gói đăng ký của bạn.";

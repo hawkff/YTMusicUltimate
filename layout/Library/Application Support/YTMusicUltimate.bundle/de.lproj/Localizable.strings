@@ -121,4 +121,4 @@
 "RENAME" = "Umbenennen";
 
 "MOBILE_AUDIO_TIER" = "Mobile-Audio-Tarif-Spoof";
-"MOBILE_AUDIO_TIER_DESC" = "Hält die kostenlose Audio-Tarif-Umgehung aktiviert. Deaktivieren, wenn du YouTube Premium hast, um native Downloads wiederherzustellen.";
+"MOBILE_AUDIO_TIER_DESC" = "Erzwingt den kostenlosen reinen Audio-Tarif. Für die übliche Umgehung aktiviert lassen; deaktivieren, wenn du echtes YouTube Premium hast und möchtest, dass die App deinen tatsächlichen Tarif widerspiegelt.";

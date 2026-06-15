@@ -121,4 +121,4 @@
 "RENAME" = "Kaydet";
 
 "MOBILE_AUDIO_TIER" = "Mobil ses katmanı taklidi";
-"MOBILE_AUDIO_TIER_DESC" = "Ücretsiz ses katmanı geçici çözümünü etkin tutar. Yerel indirmeleri geri yüklemek için YouTube Premium'unuz varsa kapatın.";
+"MOBILE_AUDIO_TIER_DESC" = "Uygulamayı ücretsiz yalnızca ses katmanına zorlar. Olağan geçici çözüm için açık bırakın; gerçek YouTube Premium'unuz varsa ve uygulamanın gerçek abonelik katmanınızı yansıtmasını istiyorsanız kapatın.";
