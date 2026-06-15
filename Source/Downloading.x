@@ -231,9 +231,14 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
             [self downloadCoverImageWithPlayerResponse:playerResponse];
         }]];
 
-        [sheetController addAction:[%c(YTActionSheetAction) actionWithTitle:LOC(@"DOWNLOAD_PREMIUM") iconImage:[%c(YTUIResources) downloadOutline] secondaryIconImage:[%c(YTUIResources) youtubePremiumBadgeLight] accessibilityIdentifier:nil handler:^ {
-            return %orig;
-        }]];
+        // The native "Download (Premium)" offline action is intentionally omitted: it cannot
+        // complete on a sideloaded / re-signed build. On-device diagnostics confirmed the native
+        // pipeline dispatches and authenticates as Premium, downloads bytes from googlevideo, but
+        // then fails because the re-signed app lacks the keychain-access-groups entitlement
+        // (securityd -34018) required to store the FairPlay persistable content key, leaving the
+        // download stuck on "Waiting…" forever. Entitlements are embedded in the code signature
+        // and cannot be granted from a tweak, so this is not fixable here. The tweak's own
+        // audio/cover downloaders above are the supported path.
 
         if (YTMU(@"downloadAudio") && YTMU(@"downloadCoverImage")) {
             [sheetController presentFromViewController:playingVC animated:YES completion:nil];
@@ -241,6 +246,9 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
             [self downloadAudioWithPlayerResponse:playerResponse playerVC:playerVC];
         } else if (YTMU(@"downloadCoverImage")) {
             [self downloadCoverImageWithPlayerResponse:playerResponse];
+        } else {
+            // Neither custom downloader is enabled: defer to the app's original badge behavior.
+            return %orig;
         }
     } else {
         YTAlertView *alertView = [%c(YTAlertView) infoDialog];
