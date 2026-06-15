@@ -47,7 +47,7 @@ jobs:
         env:
           IPA_URL: ${{ inputs.ipa_url }}
         run: |
-          curl -L --connect-timeout 15 --max-time 60 -r 0-1023 -o sample.part "$IPA_URL" > /dev/null 2>&1
+          curl -L --fail --connect-timeout 15 --max-time 60 -r 0-1023 -o sample.part "$IPA_URL" > /dev/null 2>&1
           
           file_type=$(file --mime-type -b sample.part)
 

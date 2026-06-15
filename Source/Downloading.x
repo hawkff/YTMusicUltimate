@@ -290,7 +290,8 @@ static id YTMUResolvePlayerResponse(NSArray *seeds) {
     }
 
     FFMpegDownloader *ffmpeg = [[FFMpegDownloader alloc] init];
-    ffmpeg.tempName = YTMUStringForKey(playerVC, @"contentVideoID");
+    NSString *contentID = YTMUStringForKey(playerVC, @"contentVideoID");
+    ffmpeg.tempName = contentID.length > 0 ? contentID : [[NSUUID UUID] UUIDString];
     ffmpeg.mediaName = [NSString stringWithFormat:@"%@ - %@", author, title];
     id durationValue = YTMUObjectForKey(playerVC, @"currentVideoTotalMediaTime");
     ffmpeg.duration = [durationValue respondsToSelector:@selector(doubleValue)] ? round([durationValue doubleValue]) : 0;
